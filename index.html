@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Taylor Series Calculator</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        
+        <style>
+            body {
+                background-color: #728c5a;
+                overflow-x: hidden;
+                font-family: "Poppins", serif;
+            }
+            .header {
+                font-size: 3vw;
+                color: #ebfadc;
+                text-align: center;
+            }
+            .header-div {
+                background-color: #102f15;
+                width: 100vw;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            .userinput1, .userinput2, .userinput3, .show-solution, .userinput4 {
+                background-color: #102f15;
+                font-family: Poppins;
+                color: #ebfadc;
+                height: 2vw;
+                border-radius: 10px;
+                border: 2px solid #0e0f15;
+                text-align: center;
+            }
+            .show-solution {
+    width: 55vw;
+    height: 15vw;
+    border-radius: 10px;
+    border: 2px solid #0e0f15;
+    text-align: center;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+}
+
+            .userinput1 {
+                width: 25vw;
+                position: absolute;
+                left: 100px;
+                top: 250px;
+            }
+            .userinput2 {
+                width: 25vw;
+                position: absolute;
+                left: 700px;
+                top: 250px;
+            }
+            .userinput3 {
+                width: 25vw;
+                position: absolute;
+                left: 1300px;
+                top: 250px;
+            }
+            .userinput4 {
+                width: 25vw;
+                position: absolute;
+                left: 700px;
+                top: 400px;
+            }
+            .continue-btn {
+                background-color: #ebfadc;
+                font-family: Poppins;
+                color: #0e0e0e;
+                height: 2vw;
+                width: 12vw;
+                position: absolute;
+                left: 830px;
+                top: 490px;
+                cursor: pointer;
+                font-weight: bold;
+                border-radius: 10px;
+                border: 2px solid #0e0f15;
+                transition: filter 0.2s ease-in-out;
+            }
+            .continue-btn:hover {
+                filter: brightness(85%);
+            }
+            .display-function, .display-nterms, .display-expansion, .display-xvalue {
+                color: #ebfadc;
+                position: absolute;
+            }
+            .display-function { left: 280px; top: 180px; }
+            .display-expansion { left: 825px; top: 180px; }
+            .display-nterms { left: 1400px; top: 180px; }
+            .display-xvalue { left: 935px; top: 325px; }
+            .show-solution { position: absolute; left: 420px; top: 650px; }
+        </style>
+    </head>
+    <body>
+        <div class="header-div">
+            <h1 class="header">
+                Taylor Series Calculator
+            </h1>  
+        </div>
+
+        <div class="bodyinfo">
+            <h2 class="display-function">Function:</h2>
+            <select class="userinput1" id="functionInput">
+                <option value="Math.log(x)">Logarithm</option>
+                <option value="Math.exp(x)">Exp</option>
+                <option value="Math.sin(x)">Sin</option>
+                <option value="Math.cos(x)">Cos</option>
+                <option value="Math.atan(x)">Arctan</option>
+                <option value="Math.sqrt(1 + x)">Sqrt</option>
+                <option value="f(x)">f(x)</option> 
+            </select>
+
+            <h2 class="display-expansion">Expansion Point (a):</h2>
+            <input type="number" class="userinput2" id="expansionInput">
+
+            <h2 class="display-nterms">Number of Terms (n):</h2>
+            <input type="number" class="userinput3" id="termsInput">
+
+            <h2 class="display-xvalue">X:</h2>
+            <input type="number" class="userinput4" id="xInput">
+
+            <button class="continue-btn" onclick="calculateTaylorSeries()">Calculate</button>
+
+            <h2 class="display-whole">Result:</h2>
+            <div class="show-solution" id="show-solution"></div>
+        </div>
+
+        <script>
+            function factorial(n) {
+                return n <= 1 ? 1 : n * factorial(n - 1);
+            }
+
+            function taylorLog(x, a, n) {
+                if (x <= 0) {
+                    return NaN; 
+                }
+                let sum = 0;
+                let solution = "Taylor Series Expansion for ln(x) around a = " + a + ":\n";
+                for (let i = 1; i <= n; i++) {
+                    let term = ((-1) ** (i + 1)) * Math.pow(x - a, i) / i;
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function taylorExp(x, a, n) {
+                let sum = 0;
+                let solution = "Taylor Series Expansion for exp(x) around a = " + a + ":\n";
+                for (let i = 0; i < n; i++) {
+                    let term = Math.pow(x - a, i) / factorial(i);
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function taylorSin(x, a, n) {
+                let sum = 0;
+                let solution = "Taylor Series Expansion for sin(x) around a = " + a + ":\n";
+                for (let i = 0; i < n; i++) {
+                    let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i + 1)) / factorial(2 * i + 1);
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function taylorCos(x, a, n) {
+                let sum = 0;
+                let solution = "Taylor Series Expansion for cos(x) around a = " + a + ":\n";
+                for (let i = 0; i < n; i++) {
+                    let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i)) / factorial(2 * i);
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function taylorArctan(x, a, n) {
+                let sum = 0;
+                let solution = "Taylor Series Expansion for atan(x) around a = " + a + ":\n";
+                for (let i = 0; i < n; i++) {
+                    let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i + 1)) / (2 * i + 1);
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function taylorSqrt1PlusX(x, a, n) {
+                let sum = 1;
+                let term = 1;
+                let solution = "Taylor Series Expansion for sqrt(1 + x) around a = " + a + ":\n";
+                solution += "Term 0: 1.00000\n";
+                for (let i = 1; i < n; i++) {
+                    term *= (x - a) * (3 - 2 * i) / (2 * i);
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function taylorF(x, a, n) {
+                let sum = 0;
+                let solution = "Taylor Series Approximation for f(x) around a = " + a + ":\n";
+                let derivatives = [];
+
+                for (let i = 0; i < n; i++) {
+                    let derivative = parseFloat(prompt("Enter the value of f^(" + i + ")(a):"));
+                    if (isNaN(derivative)) {
+                        alert("Invalid input. Please enter a valid number.");
+                        return { result: NaN, solution: "Invalid input for derivatives." };
+                    }
+                    derivatives.push(derivative);
+                }
+
+                for (let i = 0; i < n; i++) {
+                    let term = (derivatives[i] / factorial(i)) * Math.pow(x - a, i);
+                    sum += term;
+                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
+                }
+                solution += "Sum: " + sum.toFixed(5) + "\n";
+                return { result: sum, solution: solution };
+            }
+
+            function calculateTaylorSeries() {
+                let funcStr = document.getElementById("functionInput").value;
+                let a = parseFloat(document.getElementById("expansionInput").value);
+                let x = parseFloat(document.getElementById("xInput").value);
+                let n = parseInt(document.getElementById("termsInput").value);
+
+                if (isNaN(a) || isNaN(x) || isNaN(n)) {
+                    alert("Please enter valid inputs.");
+                    return;
+                }
+
+                let result;
+                let solution = "";
+                if (funcStr === "Math.log(x)") {
+                    result = taylorLog(x, a, n);
+                } else if (funcStr === "Math.exp(x)") {
+                    result = taylorExp(x, a, n);
+                } else if (funcStr === "Math.sin(x)") {
+                    result = taylorSin(x, a, n);
+                } else if (funcStr === "Math.cos(x)") {
+                    result = taylorCos(x, a, n);
+                } else if (funcStr === "Math.atan(x)") {
+                    result = taylorArctan(x, a, n);
+                } else if (funcStr === "Math.sqrt(1 + x)") {
+                    result = taylorSqrt1PlusX(x, a, n);
+                } else if (funcStr === "f(x)") {
+                    result = taylorF(x, a, n); 
+                } else {
+                    alert("Unsupported function. Please select a function from the dropdown.");
+                    return;
+                }
+
+                if (!isNaN(result.result)) {
+                    let formattedSolution = result.solution.replace(/\n/g, "<br>");
+                    document.getElementById("show-solution").innerHTML = formattedSolution;
+                } else {
+                    alert("Invalid calculation. Please check your inputs.");
+                }
+            }
+        </script>
+    </body>
+</html>
