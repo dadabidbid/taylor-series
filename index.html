@@ -146,85 +146,67 @@
             }
 
             function taylorLog(x, a, n) {
-                if (x <= 0) {
-                    return NaN; 
-                }
-                let sum = 0;
-                let solution = "Taylor Series Expansion for ln(x) around a = " + a + ":\n";
-                for (let i = 1; i <= n; i++) {
-                    let term = ((-1) ** (i + 1)) * Math.pow(x - a, i) / i;
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+    if (x <= 0) {
+        return { result: NaN, solution: "Error: ln(x) is undefined for x ≤ 0." };
+    }
+    let sum = Math.log(a);
+    for (let i = 1; i < n; i++) {
+        let term = ((-1) ** (i + 1)) * Math.pow(x - a, i) / (i * Math.pow(a, i));
+        sum += term;
+    }
+    return { result: sum, solution: "Sum: " + sum.toFixed(6) };
+}
 
-            function taylorExp(x, a, n) {
-                let sum = 0;
-                let solution = "Taylor Series Expansion for exp(x) around a = " + a + ":\n";
-                for (let i = 0; i < n; i++) {
-                    let term = Math.pow(x - a, i) / factorial(i);
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+function taylorExp(x, a, n) {
+    let sum = Math.exp(a);
+    for (let i = 1; i < n; i++) {
+        let term = (Math.exp(a) * Math.pow(x - a, i)) / factorial(i);
+        sum += term;
+    }
+    return { result: sum, solution: "Sum: " + sum.toFixed(6) };
+}
 
-            function taylorSin(x, a, n) {
-                let sum = 0;
-                let solution = "Taylor Series Expansion for sin(x) around a = " + a + ":\n";
-                for (let i = 0; i < n; i++) {
-                    let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i + 1)) / factorial(2 * i + 1);
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+function taylorSin(x, a, n) {
+    let sum = Math.sin(a);
+    for (let i = 1; i < n; i++) {
+        let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i + 1) * Math.cos(a)) / factorial(2 * i + 1);
+        sum += term;
+    }
+    return { result: sum, solution: "Sum: " + sum.toFixed(6) };
+}
 
-            function taylorCos(x, a, n) {
-                let sum = 0;
-                let solution = "Taylor Series Expansion for cos(x) around a = " + a + ":\n";
-                for (let i = 0; i < n; i++) {
-                    let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i)) / factorial(2 * i);
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+function taylorCos(x, a, n) {
+    let sum = Math.cos(a);
+    for (let i = 1; i < n; i++) {
+        let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i) * Math.sin(a)) / factorial(2 * i);
+        sum += term;
+    }
+    return { result: sum, solution: "Sum: " + sum.toFixed(6) };
+}
 
-            function taylorArctan(x, a, n) {
-                let sum = 0;
-                let solution = "Taylor Series Expansion for atan(x) around a = " + a + ":\n";
-                for (let i = 0; i < n; i++) {
-                    let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i + 1)) / (2 * i + 1);
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+function taylorArctan(x, a, n) {
+    let sum = Math.atan(a);
+    for (let i = 1; i < n; i++) {
+        let term = (Math.pow(-1, i) * Math.pow(x - a, 2 * i + 1)) / ((2 * i + 1) * Math.pow(1 + a * a, i));
+        sum += term;
+    }
+    return { result: sum, solution: "Sum: " + sum.toFixed(6) };
+}
 
-            function taylorSqrt1PlusX(x, a, n) {
-                let sum = 1;
-                let term = 1;
-                let solution = "Taylor Series Expansion for sqrt(1 + x) around a = " + a + ":\n";
-                solution += "Term 0: 1.00000\n";
-                for (let i = 1; i < n; i++) {
-                    term *= (x - a) * (3 - 2 * i) / (2 * i);
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+function taylorSqrt1PlusX(x, a, n) {
+    if (a <= -1) {
+        return { result: NaN, solution: "Error: sqrt(1 + x) is undefined for x ≤ -1." };
+    }
+    let sum = Math.sqrt(1 + a);
+    for (let i = 1; i < n; i++) {
+        let term = (Math.pow(-1, i + 1) * Math.pow(x - a, i) * (0.5 * Math.pow(1 + a, -0.5 - (i - 1)))) / i;
+        sum += term;
+    }
+    return { result: sum, solution: "Sum: " + sum.toFixed(6) };
+}
 
             function taylorF(x, a, n) {
     let funcStr = document.getElementById("functionInput").value;
-
 
     if (funcStr === "f(x)") {
         funcStr = prompt("Enter the function f(x) in terms of x (e.g., 'x^3 - 2*x + 5'):");
@@ -236,18 +218,15 @@
 
     try {
         let derivatives = getDerivatives(funcStr, n);
-        let sum = derivatives[0].evaluate({ x: a }); 
-        let solution = "Taylor Series Approximation for f(x) around a = " + a + ":\n";
+        let sum = derivatives[0].evaluate({ x: a });
 
         for (let i = 1; i <= n; i++) {
             let derivativeValue = derivatives[i].evaluate({ x: a });
             let term = (derivativeValue / factorial(i)) * Math.pow(x - a, i);
             sum += term;
-            solution += "Term " + i + ": " + term.toFixed(6) + "<br>";
         }
 
-        solution += "Sum: " + sum.toFixed(6);
-        return { result: sum, solution: solution };
+        return { result: sum, solution: "Sum: " + sum.toFixed(6) };
     } catch (error) {
         alert("Invalid function input. Please enter a valid mathematical expression.");
         return { result: NaN, solution: "Error: Invalid function." };
