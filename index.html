@@ -6,6 +6,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.min.js"></script>
         
         <style>
             body {
@@ -35,17 +36,17 @@
                 text-align: center;
             }
             .show-solution {
-    width: 55vw;
-    height: 15vw;
-    border-radius: 10px;
-    border: 2px solid #0e0f15;
-    text-align: center;
-    pointer-events: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column; 
-}
+                width: 55vw;
+                height: 15vw;
+                border-radius: 10px;
+                border: 2px solid #0e0f15;
+                text-align: center;
+                pointer-events: none;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column; 
+            }
 
             .userinput1 {
                 width: 25vw;
@@ -139,6 +140,11 @@
                 return n <= 1 ? 1 : n * factorial(n - 1);
             }
 
+    
+            function f(x) {
+                return x * x + 2 * x + 1; 
+            }
+
             function taylorLog(x, a, n) {
                 if (x <= 0) {
                     return NaN; 
@@ -217,67 +223,74 @@
             }
 
             function taylorF(x, a, n) {
-                let sum = 0;
-                let solution = "Taylor Series Approximation for f(x) around a = " + a + ":\n";
-                let derivatives = [];
+    let funcStr = document.getElementById("functionInput").value;
 
-                for (let i = 0; i < n; i++) {
-                    let derivative = parseFloat(prompt("Enter the value of f^(" + i + ")(a):"));
-                    if (isNaN(derivative)) {
-                        alert("Invalid input. Please enter a valid number.");
-                        return { result: NaN, solution: "Invalid input for derivatives." };
-                    }
-                    derivatives.push(derivative);
-                }
 
-                for (let i = 0; i < n; i++) {
-                    let term = (derivatives[i] / factorial(i)) * Math.pow(x - a, i);
-                    sum += term;
-                    solution += "Term " + i + ": " + term.toFixed(5) + "\n";
-                }
-                solution += "Sum: " + sum.toFixed(5) + "\n";
-                return { result: sum, solution: solution };
-            }
+    if (funcStr === "f(x)") {
+        funcStr = prompt("Enter the function f(x) in terms of x (e.g., 'x^3 - 2*x + 5'):");
+        if (!funcStr) {
+            alert("Invalid function input.");
+            return { result: NaN, solution: "Error: No function provided." };
+        }
+    }
 
-            function calculateTaylorSeries() {
-                let funcStr = document.getElementById("functionInput").value;
-                let a = parseFloat(document.getElementById("expansionInput").value);
-                let x = parseFloat(document.getElementById("xInput").value);
-                let n = parseInt(document.getElementById("termsInput").value);
+    try {
+        let derivatives = getDerivatives(funcStr, n);
+        let sum = derivatives[0].evaluate({ x: a }); 
+        let solution = "Taylor Series Approximation for f(x) around a = " + a + ":\n";
 
-                if (isNaN(a) || isNaN(x) || isNaN(n)) {
-                    alert("Please enter valid inputs.");
-                    return;
-                }
+        for (let i = 1; i <= n; i++) {
+            let derivativeValue = derivatives[i].evaluate({ x: a });
+            let term = (derivativeValue / factorial(i)) * Math.pow(x - a, i);
+            sum += term;
+            solution += "Term " + i + ": " + term.toFixed(6) + "<br>";
+        }
 
-                let result;
-                let solution = "";
-                if (funcStr === "Math.log(x)") {
-                    result = taylorLog(x, a, n);
-                } else if (funcStr === "Math.exp(x)") {
-                    result = taylorExp(x, a, n);
-                } else if (funcStr === "Math.sin(x)") {
-                    result = taylorSin(x, a, n);
-                } else if (funcStr === "Math.cos(x)") {
-                    result = taylorCos(x, a, n);
-                } else if (funcStr === "Math.atan(x)") {
-                    result = taylorArctan(x, a, n);
-                } else if (funcStr === "Math.sqrt(1 + x)") {
-                    result = taylorSqrt1PlusX(x, a, n);
-                } else if (funcStr === "f(x)") {
-                    result = taylorF(x, a, n); 
-                } else {
-                    alert("Unsupported function. Please select a function from the dropdown.");
-                    return;
-                }
+        solution += "Sum: " + sum.toFixed(6);
+        return { result: sum, solution: solution };
+    } catch (error) {
+        alert("Invalid function input. Please enter a valid mathematical expression.");
+        return { result: NaN, solution: "Error: Invalid function." };
+    }
+}
 
-                if (!isNaN(result.result)) {
-                    let formattedSolution = result.solution.replace(/\n/g, "<br>");
-                    document.getElementById("show-solution").innerHTML = formattedSolution;
-                } else {
-                    alert("Invalid calculation. Please check your inputs.");
-                }
-            }
+function factorial(n) {
+    return n === 0 ? 1 : n * factorial(n - 1);
+}
+
+function getDerivatives(funcStr, maxOrder) {
+    let derivatives = [];
+    let currentDerivative = math.parse(funcStr); 
+
+    for (let i = 0; i <= maxOrder; i++) {
+        derivatives.push(currentDerivative.compile()); 
+        currentDerivative = math.derivative(currentDerivative, 'x');
+    }
+
+    return derivatives;
+}
+
+
+
+
+function calculateTaylorSeries() {
+    let a = parseFloat(document.getElementById("expansionInput").value);
+    let x = parseFloat(document.getElementById("xInput").value);
+    let n = parseInt(document.getElementById("termsInput").value);
+
+    if (isNaN(a) || isNaN(x) || isNaN(n) || n < 1) {
+        alert("Please enter valid numerical inputs.");
+        return;
+    }
+
+    let result = taylorF(x, a, n);
+
+    if (!isNaN(result.result)) {
+        document.getElementById("show-solution").innerHTML = result.solution;
+    } else {
+        alert("Invalid calculation. Please check your inputs.");
+    }
+}
         </script>
     </body>
 </html>
